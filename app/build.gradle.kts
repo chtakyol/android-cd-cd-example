@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.cihatakyol.androidcdcdexample"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.cihatakyol.androidcdcdexample"
@@ -20,10 +20,39 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+            buildConfigField(
+                "String",
+                "BUILD_TYPE",
+                "\"${android.defaultConfig.versionName}-(${android.defaultConfig.versionCode})\""
+            )
+        }
+
+        debug {
+            versionNameSuffix = "-debug"
+            isMinifyEnabled = false
+            buildConfigField(
+                "String",
+                "BUILD_TYPE",
+                "\"$versionNameSuffix - ${android.defaultConfig.versionName}-(${android.defaultConfig.versionCode})\""
+            )
+        }
+
+        create("staging") {
+            versionNameSuffix = "-staging"
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField(
+                "String",
+                "BUILD_TYPE",
+                "\"$versionNameSuffix - ${android.defaultConfig.versionName}-(${android.defaultConfig.versionCode})\""
             )
         }
     }
@@ -36,6 +65,31 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+}
+
+
+tasks.register("printVersionName") {
+    doLast {
+        println(android.defaultConfig.versionName)
+    }
+}
+
+tasks.register("printVersionCode") {
+    doLast {
+        println(android.defaultConfig.versionCode)
+    }
+}
+
+tasks.register("printVersionSuffix") {
+    doLast {
+        val buildType = project.gradle.startParameter.taskNames.find { it.contains("assemble") }
+            ?.replace("assemble", "")
+            ?.lowercase() ?: "debug"
+
+        val suffix = android.buildTypes.findByName(buildType)?.versionNameSuffix ?: ""
+        println(suffix)
     }
 }
 
