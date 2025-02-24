@@ -20,28 +20,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidCdCdExampleTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    Text(
+                        text = BuildConfig.BUILD_TYPE,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AndroidCdCdExampleTheme {
-        Greeting("Android")
     }
 }
