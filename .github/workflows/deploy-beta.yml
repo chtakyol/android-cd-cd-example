@@ -56,11 +56,17 @@ jobs:
       - name: Debug APK
         run: ls -R ./artifacts
 
+      - name: Find and Set APK Path
+        run: echo "APK_PATH=$(find ./artifacts -name '*.apk' | head -n 1)" >> $GITHUB_ENV
+
+      - name: Debug APK Path
+        run: echo "Using APK at $APK_PATH"
+
       - name: Run UI Tests with Maestro Cloud
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
-          app-file: ./artifacts/debug-apk
+          app-file: ${{ env.APK_PATH }}
 
       - name: Deploy to Beta
         run: fastlane upload_to_beta
