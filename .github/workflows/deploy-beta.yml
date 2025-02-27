@@ -37,7 +37,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
   deploy:
@@ -60,7 +60,7 @@ jobs:
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
-          app-file: ./artifacts/app-debug.apk
+          app-file: ./artifacts/debug-apk.apk
 
       - name: Deploy to Beta
         run: fastlane upload_to_beta
