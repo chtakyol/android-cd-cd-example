@@ -60,7 +60,7 @@ jobs:
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
-          app-file: ./artifacts/debug-apk.apk
+          app-file: ./artifacts/debug-apk
 
       - name: Deploy to Beta
         run: fastlane upload_to_beta
