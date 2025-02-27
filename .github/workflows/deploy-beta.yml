@@ -6,65 +6,48 @@ on:
       - release/*
 
 jobs:
-  build:
+  build-robin:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
         with:
-          ruby-version: '3.1'
+          java-version: 11
+          distribution: 'temurin'
 
-      - name: Install Dependencies
-        run: |
-          gem install bundler
-          bundle install
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
 
-      - name: Install OpenSSL
-        run: sudo apt-get install -y openssl
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Decode and Write Keystore File
-        run: |
-          echo "${{ secrets.KEYSTORE_FILE }}" | openssl base64 -d -out my-release-key.jks
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+  deploy:
+    needs: build-robin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Verify Keystore File
-        run: |
-          if [ -s my-release-key.jks ]; then
-          echo "Keystore file created successfully."
-          ls -l my-release-key.jks
-          else
-          echo "Keystore file is empty or missing!" && exit 1
-          fi
+      - name: Download Debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-debug
+          path: ./artifacts
 
-      - name: Debug Environment Variables
-        run: |
-          echo "KEYSTORE_PASSWORD is set" 
-          echo "KEY_ALIAS is set"
-          echo "KEY_PASSWORD is set"
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Debug APK
+        run: ls -R ./artifacts
 
-      - name: Check Keystore File Existence
-        run: ls -l ./my-release-key.jks
-
-      - name: Check Keystore Path
-        run: realpath ./my-release-key.jks
-
-      - name: Decrypt Play Store Credentials File
-        run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore_credentials.json
-
-      - name: Install Fastlane
-        run: sudo gem install fastlane
-
-      - name: Test
-        run: fastlane test
+      - name: Run UI Tests with Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          app-file: ./artifacts/app-debug.apk
 
       - name: Deploy to Beta
         run: fastlane upload_to_beta
