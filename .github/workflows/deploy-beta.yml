@@ -69,6 +69,20 @@ jobs:
           project-id: ${{ secrets.ROBIN_PROJECT_ID }}
           app-file: ${{ env.APK_PATH }}
 
+      - name: Install Dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Install OpenSSL
+        run: sudo apt-get install -y openssl
+
+      - name: Decode and Write Keystore File
+        run: |
+          echo "${{ secrets.KEYSTORE_FILE }}" | openssl base64 -d -out my-release-key.jks
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+
       - name: Deploy to Beta
         run: fastlane upload_to_beta
         env:
