@@ -69,11 +69,6 @@ jobs:
           project-id: ${{ secrets.ROBIN_PROJECT_ID }}
           app-file: ${{ env.APK_PATH }}
 
-      - name: Install Dependencies
-        run: |
-          gem install bundler
-          bundle install
-
       - name: Install OpenSSL
         run: sudo apt-get install -y openssl
 
