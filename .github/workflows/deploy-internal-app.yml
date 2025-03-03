@@ -6,21 +6,68 @@ on:
       - develop
 
 jobs:
-  build:
+  build-robin:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
         with:
-          ruby-version: '3.1'
+          distribution: 'zulu'
+          java-version: 17
 
-      - name: Install Dependencies
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Extract Version Name, Code & Suffix
+        id: version
         run: |
-          gem install bundler
-          bundle install
+          VERSION_NAME=$(./gradlew -q printVersionName)
+          VERSION_CODE=$(./gradlew -q printVersionCode)
+          VERSION_SUFFIX=$(./gradlew -q printVersionSuffix)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          echo "VERSION_SUFFIX=$VERSION_SUFFIX" >> $GITHUB_ENV
+
+      - name: Build the project
+        run: ./gradlew clean assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+  deploy:
+    needs: build-robin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-apk
+          path: ./artifacts
+
+      - name: Debug APK
+        run: ls -R ./artifacts
+
+      - name: Find and Set APK Path
+        run: echo "APK_PATH=$(find ./artifacts -name '*.apk' | head -n 1)" >> $GITHUB_ENV
+
+      - name: Debug APK Path
+        run: echo "Using APK at $APK_PATH"
+
+      - name: Run UI Tests with Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          app-file: ${{ env.APK_PATH }}
 
       - name: Install OpenSSL
         run: sudo apt-get install -y openssl
@@ -30,41 +77,6 @@ jobs:
           echo "${{ secrets.KEYSTORE_FILE }}" | openssl base64 -d -out my-release-key.jks
         env:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-
-      - name: Verify Keystore File
-        run: |
-          if [ -s my-release-key.jks ]; then
-          echo "Keystore file created successfully."
-          ls -l my-release-key.jks
-          else
-          echo "Keystore file is empty or missing!" && exit 1
-          fi
-
-      - name: Debug Environment Variables
-        run: |
-          echo "KEYSTORE_PASSWORD is set" 
-          echo "KEY_ALIAS is set"
-          echo "KEY_PASSWORD is set"
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Check Keystore File Existence
-        run: ls -l ./my-release-key.jks
-
-      - name: Check Keystore Path
-        run: realpath ./my-release-key.jks
-
-      - name: Decrypt Play Store Credentials File
-        run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore_credentials.json
-
-      - name: Install Fastlane
-        run: sudo gem install fastlane
-
-      - name: Test
-        run: fastlane test
 
       - name: Deploy to Internal Testing
         run: fastlane upload_to_internal_test
