@@ -1,0 +1,44 @@
+name: Build test apk
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Tests
+        run: ./gradlew test
+
+      - name: Extract Version Name, Code & Suffix
+        id: version
+        run: |
+          VERSION_NAME=$(./gradlew -q printVersionName)
+          VERSION_CODE=$(./gradlew -q printVersionCode)
+          VERSION_SUFFIX=$(./gradlew -q printVersionSuffix)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          echo "VERSION_SUFFIX=$VERSION_SUFFIX" >> $GITHUB_ENV
+
+      - name: Build the project
+        run: ./gradlew clean assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          path: app/build/outputs/apk/debug/*.apk

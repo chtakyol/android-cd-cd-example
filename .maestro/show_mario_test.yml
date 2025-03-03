@@ -1,0 +1,7 @@
+appId: com.cihatakyol.androidcdcdexample
+---
+- launchApp
+
+- tapOn: "Show Mario"
+
+- assertVisible: "it's me mario."
