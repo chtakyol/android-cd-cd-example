@@ -27,8 +27,7 @@ lane :upload_to_internal_test do
       skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_images: true,
-      skip_upload_screenshots: true,
-      json_key_data: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT"]
+      skip_upload_screenshots: true
   )
 end
 
@@ -46,8 +45,7 @@ lane :upload_to_beta do
   )
   upload_to_play_store(
     skip_upload_apk: true,
-    track: 'beta',
-    json_key: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT"]
+    track: 'beta'
   )
 end
 
@@ -63,7 +61,5 @@ lane :upload_to_production do
       "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
     }
   )
-  upload_to_play_store(
-    json_key: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT"]
-  )
+  upload_to_play_store
 end
