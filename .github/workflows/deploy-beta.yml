@@ -78,6 +78,12 @@ jobs:
         env:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
 
+      - name: Decrypt Play Store Credentials File
+        run: |
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out playstore-credentials.json
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+
       - name: Deploy to Beta
         run: fastlane upload_to_beta
         env:
