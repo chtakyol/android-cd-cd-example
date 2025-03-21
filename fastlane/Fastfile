@@ -28,7 +28,7 @@ lane :upload_to_internal_test do
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      json_key: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT"]
+      json_key_data: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT"]
   )
 end
 
