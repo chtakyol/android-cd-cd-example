@@ -9,6 +9,12 @@ lane :debug_build do
   )
 end
 
+lane :upload_to_internal_app_sharing do
+  upload_to_play_store_internal_app_sharing(
+    apk: ENV["APK_PATH"]
+  )
+end
+
 lane :upload_to_internal_test do
   keystore_path = File.expand_path("../my-release-key.jks", __dir__)
   gradle(

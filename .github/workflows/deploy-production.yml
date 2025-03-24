@@ -31,6 +31,12 @@ jobs:
         env:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
 
+      - name: Decrypt Play Store Credentials File
+        run: |
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out playstore-credentials.json
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+
       - name: Verify Keystore File
         run: |
           if [ -s my-release-key.jks ]; then
@@ -59,6 +65,8 @@ jobs:
       - name: Decrypt Play Store Credentials File
         run: |
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore_credentials.json
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
 
       - name: Install Fastlane
         run: sudo gem install fastlane
@@ -66,8 +74,8 @@ jobs:
       - name: Test
         run: fastlane test
 
-      - name: Deploy to Production
-        run: fastlane upload_to_production
+      - name: Deploy to Internal Testing
+        run: fastlane upload_to_internal_app_sharing
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
