@@ -73,7 +73,7 @@ jobs:
         run: fastlane test
 
       - name: Deploy to Internal Testing
-        run: fastlane upload_to_internal_app_sharing
+        run: fastlane upload_to_internal_test
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
