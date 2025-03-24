@@ -68,23 +68,3 @@ jobs:
 #          api-key: ${{ secrets.ROBIN_API_KEY }}
 #          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
 #          app-file: ${{ env.APK_PATH }}
-
-      - name: Install OpenSSL
-        run: sudo apt-get install -y openssl
-
-      - name: Decode and Write Keystore File
-        run: |
-          echo "${{ secrets.KEYSTORE_FILE }}" | openssl base64 -d -out my-release-key.jks
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-
-      - name: Decrypt Play Store Credentials File
-        run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore-credentials.json
-
-      - name: Deploy to Internal Testing
-        run: fastlane upload_to_internal_app_sharing
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

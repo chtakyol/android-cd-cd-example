@@ -74,8 +74,8 @@ jobs:
       - name: Test
         run: fastlane test
 
-      - name: Deploy to Production
-        run: fastlane upload_to_production
+      - name: Deploy to Internal Testing
+        run: fastlane upload_to_internal_app_sharing
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
