@@ -64,9 +64,7 @@ jobs:
 
       - name: Decrypt Play Store Credentials File
         run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore_credentials.json
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore-credentials.json
 
       - name: Install Fastlane
         run: sudo gem install fastlane
