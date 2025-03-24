@@ -80,7 +80,7 @@ jobs:
 
       - name: Decrypt Play Store Credentials File
         run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out playstore-credentials.json
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore-credentials.json
 
       - name: Deploy to Beta
         run: fastlane upload_to_beta
