@@ -83,7 +83,7 @@ jobs:
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}" | openssl base64 -d -out ./fastlane/playstore-credentials.json
 
       - name: Deploy to Internal Testing
-        run: fastlane upload_to_internal_test
+        run: fastlane upload_to_internal_app_sharing
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}

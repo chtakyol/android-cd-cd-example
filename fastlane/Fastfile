@@ -9,6 +9,23 @@ lane :debug_build do
   )
 end
 
+lane :upload_to_internal_app_sharing do
+  keystore_path = File.expand_path("../my-release-key.jks", __dir__)
+  gradle(
+    task: 'bundle',
+    build_type: 'Release',
+    properties: {
+      "android.injected.signing.store.file" => keystore_path,
+      "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+      "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
+      "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+    }
+  )
+  upload_to_play_store_internal_app_sharing(
+    apk: "app/build/outputs/apk/debug/*.apk"
+  )
+end
+
 lane :upload_to_internal_test do
   keystore_path = File.expand_path("../my-release-key.jks", __dir__)
   gradle(
