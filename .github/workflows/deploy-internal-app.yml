@@ -3,7 +3,7 @@ name: Deploy app to internal test
 on:
   push:
     branches:
-      - develop
+      - release/*
 
 jobs:
   build-robin:
@@ -68,3 +68,6 @@ jobs:
 #          api-key: ${{ secrets.ROBIN_API_KEY }}
 #          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
 #          app-file: ${{ env.APK_PATH }}
+
+#      - name: Deploy to Internal Testing
+#        run: fastlane upload_to_internal_app_sharing
