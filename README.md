@@ -17,18 +17,18 @@ This repository demonstrates an Android CI/CD process with a structured branchin
 - Merging a feature branch into `develop` triggers:
   - Build process
   - Ui tests (with Maestro)
-  - Internal test APK upload to Google Play Store
+  - Uploads the build Github Action Artifacts
 
 ### 3. Release Branch (`release/*`)
 - Creating or merging into a `release/*` branch triggers:
   - Build process
   - Ui tests (with Maestro)
-  - Beta APK upload to Google Play Store
+  - Uploads the build Github Action Artifacts
 
 ### 4. Master Branch (`master`)
 - Merging a release branch into `master` triggers:
   - Production release build
-  - APK upload to Google Play Store (Production)
+  - APK upload to Google Play Store (Internal app testing)
 
 ## Summary Table
 | Branch        | Triggered Actions |
